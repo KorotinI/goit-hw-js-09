@@ -30,7 +30,6 @@ function handleInput() {
   };
   saveFormData(formData);
 }
-
 function handleTextarea() {
   const formData = {
     ...getFormData(),
