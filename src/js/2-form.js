@@ -1,55 +1,38 @@
-const STORAGE_KEY = 'feedback-form-state';
-const form = document.querySelector('.feedback-form');
-const input = document.querySelector('input');
-const textarea = document.querySelector('textarea');
+const feedbackForm = document.querySelector('form.feedback-form');
+const emailInput = feedbackForm.elements.email;
+const messageInput = feedbackForm.elements.message;
+const localStorageKey = "feedback-form-state";
 
-form.addEventListener('submit', handleFormSubmit);
-textarea.addEventListener('input', handleTextarea);
-input.addEventListener('input', handleInput);
-populateFields();
+const localFormValues = JSON.parse(localStorage.getItem(localStorageKey) );
+emailInput.value = localFormValues ? localFormValues.email : "";
+messageInput.value = localFormValues ? localFormValues.message : "";
 
-function handleFormSubmit(e) {
-  e.preventDefault();
-  const formData = getFormData();
-  if (
-    !formData.email ||
-    !formData.message ||
-    formData.email.trim() === '' ||
-    formData.message.trim() === ''
-  ) {
-    return;
-  }
-  console.log(formData);
-  localStorage.removeItem(STORAGE_KEY);
-  e.currentTarget.reset();
-}
-function handleInput() {
-  const formData = {
-    ...getFormData(),
-    email: input.value.trim(),
-  };
-  saveFormData(formData);
-}
-function handleTextarea() {
-  const formData = {
-    ...getFormData(),
-    message: textarea.value.trim(),
-  };
-  saveFormData(formData);
-}
-function getFormData() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-}
-function saveFormData(formData) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-}
+feedbackForm.addEventListener("input", event => {
+    const elements = event.currentTarget.elements;
+    const emailValue = elements.email.value;
+    const messageValue = elements.message.value;
+    const formValues = {
+        email: emailValue.trim(),
+        message: messageValue.trim(),
+    }
+  localStorage.setItem(localStorageKey, JSON.stringify(formValues));
+    });
 
-function populateFields() {
-  const formData = getFormData();
-  if (formData.email) {
-    input.value = formData.email;
-  }
-  if (formData.message) {
-    textarea.value = formData.message;
-  }
-}
+feedbackForm.addEventListener("submit", event => {
+    event.preventDefault();
+    const elements = event.target.elements;
+    const emailValue = elements.email.value;
+    const messageValue = elements.message.value;
+    if (emailValue === "" || messageValue === "") {
+        alert("All form fields must be filled in");
+        return;
+    }
+    const formValues = {
+        email: emailValue.trim(),
+        message: messageValue.trim(),
+    }
+    localStorage.setItem(localStorageKey, JSON.stringify(formValues));
+    console.log(JSON.parse(localStorage.getItem(localStorageKey)));
+    localStorage.removeItem(localStorageKey);
+    feedbackForm.reset();
+})
